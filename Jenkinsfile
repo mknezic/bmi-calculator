@@ -6,6 +6,47 @@ pipeline {
     }
 
     stages {
+        stage('continuous integration') {
+            agent {
+                docker {
+                    image 'node:16.13.1-alpine'
+                }
+            }
+            stages {
+                stage('npm install') {
+                    steps {
+                        script {
+                            echo "node install"
+                            sh 'node -v'
+                            sh 'npm install'
+                        }
+                    }
+                }
+                stage('unit test') {
+                    steps {
+                        script {
+                            echo "node test"
+                            sh 'npm run test'
+                        }
+                    }
+                    post {
+                        always {
+                            cobertura lineCoverageTargets: '70, 0, 0', coberturaReportFile: 'coverage/cobertura-coverage.xml'
+                        }
+                    }
+                }
+                stage('build') {
+                    steps {
+                        script {
+                            echo "build"
+                            sh 'npm start'
+                            sh 'npm pack'
+                        }
+                    }
+                }
+            }
+        }
+        /*
         stage('SCA') {
             steps {
                 withSonarQubeEnv('sonar') {
@@ -17,5 +58,6 @@ pipeline {
                 }
             }
         }
+        */
     }
 }

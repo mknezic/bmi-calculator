@@ -17,7 +17,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --coverage",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
@@ -26,6 +26,7 @@
     "cypress": "cypress open"
   },
   "jest": {
+	"coverageReporters": [ "text", "cobertura" ], 
     "collectCoverageFrom": [
       "src/**/*.{js,jsx}",
       "!src/index.js"
