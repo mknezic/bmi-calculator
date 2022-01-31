@@ -22,6 +22,7 @@ pipeline {
                         }
                     }
                 }
+                /*
                 stage('unit test') {
                     steps {
                         script {
@@ -35,13 +36,18 @@ pipeline {
                         }
                     }
                 }
+                */
                 stage('build') {
                     steps {
                         script {
                             echo "build"
-                            sh 'npm start'
-                            sh 'npm pack'
+                            sh 'npm run build'
+                            sh 'ls -la'
+                            sh 'pwd'
                         }
+                        zip dir: 'build', zipFile: 'bmi-calculator-artifacts.zip'
+                        archiveArtifacts artifacts: 'bmi-calculator-artifacts.zip', fingerprint: true, onlyIfSuccessful: true
+                        stash includes: 'bmi-calculator-artifacts.zip', name: 'built-artifacts'
                     }
                 }
             }
