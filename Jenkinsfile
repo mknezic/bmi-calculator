@@ -45,9 +45,21 @@ pipeline {
                             sh 'ls -la'
                             sh 'pwd'
                         }
-                        zip dir: 'build', zipFile: 'bmi-calculator-artifacts.zip'
+                        zip dir: 'build', zipFile: 'bmi-calculator-artifacts.zip', overwrite: true
                         archiveArtifacts artifacts: 'bmi-calculator-artifacts.zip', fingerprint: true, onlyIfSuccessful: true
                         stash includes: 'bmi-calculator-artifacts.zip', name: 'built-artifacts'
+                    }
+                }
+            }
+        }
+        stage('deploy') {
+            steps {
+                unstash 'built-artifacts'
+                unzip dir: 'bmi-calc', zipFile: 'bmi-calculator-artifacts.zip'
+                script {
+                    docker.build('mknezic/bmi-calculator:1.0')
+                    withDockerRegistry(credentialsId: "dockerhub-credentials") {
+                        sh "docker push mknezic/bmi-calculator:1.0"
                     }
                 }
             }
