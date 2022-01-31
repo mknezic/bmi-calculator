@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         scannerHome = tool 'sqs'
+        nodejs = tool 'nodejs'
     }
 
     stages {
@@ -9,9 +10,9 @@ pipeline {
             steps {
                 withSonarQubeEnv('sonar') {
                     echo 'Code Quality checks using SonarQube Scanner'
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=bmi-calculator"
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=bmi-calculator -Dsonar.nodejs.executable=${nodejs}/bin/node"
                 }
-                timeout(time: 10, unit: 'MINUTES') {
+                timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
