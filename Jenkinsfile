@@ -48,11 +48,12 @@ pipeline {
                         zip dir: 'build', zipFile: 'bmi-calculator-artifacts.zip', overwrite: true
                         archiveArtifacts artifacts: 'bmi-calculator-artifacts.zip', fingerprint: true, onlyIfSuccessful: true
                         stash includes: 'bmi-calculator-artifacts.zip', name: 'built-artifacts'
+                        stash includes: 'deployment.yaml', name: 'deployment'
                     }
                 }
             }
         }
-        stage('deploy') {
+        stage('deploy image') {
             steps {
                 unstash 'built-artifacts'
                 unzip dir: 'bmi-calc', zipFile: 'bmi-calculator-artifacts.zip'
@@ -77,5 +78,14 @@ pipeline {
             }
         }
         */
+        stage('deploy kubernetes') {
+            agent {
+                label 'kubernetes'
+            }
+            steps {
+                unstash 'deployment'
+                sh 'kubectl apply -f deployment.yaml'
+            }
+        }
     }
 }
